@@ -1,0 +1,198 @@
+- meta:
+    map: example_map
+    node: Start
+    pointset: mb_test2
+  node:
+    edges:
+    - action: move_base
+      edge_id: Start_Second
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: Second
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    localise_by_topic: ''
+    map: example_map
+    name: Start
+    pointset: mb_test2
+    pose:
+      orientation:
+        w: 0.92388
+        x: 0
+        y: 0
+        z: 0.38268
+      position:
+        x: -2.2
+        y: 1.8
+        z: 0.0
+    verts:
+    - x: 0.689999997616
+      y: 0.287000000477
+    - x: 0.287000000477
+      y: 0.689999997616
+    - x: -0.287000000477
+      y: 0.689999997616
+    - x: -0.689999997616
+      y: 0.287000000477
+    - x: -0.689999997616
+      y: -0.287000000477
+    - x: -0.287000000477
+      y: -0.689999997616
+    - x: 0.287000000477
+      y: -0.689999997616
+    - x: 0.689999997616
+      y: -0.287000000477
+    xy_goal_tolerance: 0.3
+    yaw_goal_tolerance: 0.1
+- meta:
+    map: example_map
+    node: Second
+    pointset: mb_test2
+  node:
+    edges:
+    - action: move_base
+      edge_id: Second_Start
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: Start
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    - action: move_base
+      edge_id: Second_Third
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: Third
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    localise_by_topic: ''
+    map: example_map
+    name: Second
+    pointset: mb_test2
+    pose:
+      orientation:
+        w: 0.70711
+        x: 0.0
+        y: 0.0
+        z: -0.70711
+      position:
+        x: -2.2
+        y: -0.5
+        z: 0.0
+    verts:
+    - x: 0.689999997616
+      y: 0.287000000477
+    - x: 0.287000000477
+      y: 0.689999997616
+    - x: -0.287000000477
+      y: 0.689999997616
+    - x: -0.689999997616
+      y: 0.287000000477
+    - x: -0.689999997616
+      y: -0.287000000477
+    - x: -0.287000000477
+      y: -0.689999997616
+    - x: 0.287000000477
+      y: -0.689999997616
+    - x: 0.689999997616
+      y: -0.287000000477
+    xy_goal_tolerance: 0.3
+    yaw_goal_tolerance: 0.1
+- meta:
+    map: example_map
+    node: Third
+    pointset: mb_test2
+  node:
+    edges:
+    - action: move_base
+      edge_id: Third_Second
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: Second
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    - action: move_base
+      edge_id: Third_End
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: End
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    localise_by_topic: ''
+    map: example_map
+    name: Third
+    pointset: mb_test2
+    pose:
+      orientation:
+        w: 0.70711
+        x: 0.0
+        y: 0.0
+        z: -0.70711
+      position:
+        x: -0.2
+        y: -0.5
+        z: 0.0
+    verts:
+    - x: 0.689999997616
+      y: 0.287000000477
+    - x: 0.287000000477
+      y: 0.689999997616
+    - x: -0.287000000477
+      y: 0.689999997616
+    - x: -0.689999997616
+      y: 0.287000000477
+    - x: -0.689999997616
+      y: -0.287000000477
+    - x: -0.287000000477
+      y: -0.689999997616
+    - x: 0.287000000477
+      y: -0.689999997616
+    - x: 0.689999997616
+      y: -0.287000000477
+    xy_goal_tolerance: 0.3
+    yaw_goal_tolerance: 0.1
+- meta:
+    map: example_map
+    node: End
+    pointset: mb_test2
+  node:
+    edges:
+    - action: move_base
+      edge_id: End_Third
+      inflation_radius: 0.0
+      map_2d: example_map
+      node: Third
+      recovery_behaviours_config: ''
+      top_vel: 0.55
+    localise_by_topic: ''
+    map: example_map
+    name: End
+    pointset: mb_test2
+    pose:
+      orientation:
+        w: 0.70711
+        x: 0.0
+        y: 0.0
+        z: -0.70711
+      position:
+        x: -0.2
+        y: 1.3
+        z: 0.0
+    verts:
+    - x: 0.689999997616
+      y: 0.287000000477
+    - x: 0.287000000477
+      y: 0.689999997616
+    - x: -0.287000000477
+      y: 0.689999997616
+    - x: -0.689999997616
+      y: 0.287000000477
+    - x: -0.689999997616
+      y: -0.287000000477
+    - x: -0.287000000477
+      y: -0.689999997616
+    - x: 0.287000000477
+      y: -0.689999997616
+    - x: 0.689999997616
+      y: -0.287000000477
+    xy_goal_tolerance: 0.3
+    yaw_goal_tolerance: 0.1
