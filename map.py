@@ -3,8 +3,6 @@ import yaml
 from point import point
 
 class map:
-    
-
     def __init__(self):
         self.map_name = ""
         self.points = []
