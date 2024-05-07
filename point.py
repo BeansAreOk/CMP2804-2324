@@ -24,3 +24,6 @@ class point:
         self.edges = []
         for edge in n["node"]["edges"]:
             self.edges.append(edge["node"])
+  
+    def __str__(self):
+        return str(self.name) + str(self.coord) + str(self.orientation) + str(self.edges)

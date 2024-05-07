@@ -9,11 +9,12 @@ yaml_file = map()
 map_scale = 10
 
 def home():
+    menu = ["menu", ["New Node", 'Move Node', "Edit Node", "Delete Node"]]
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
     layout2 = [[sg.Text("Please enter the name of the YAML file you wish to open:", key="text1")], [sg.Input(key="INPUT")], [sg.Button("Ok", key="Ok1")], [sg.Button("Back", key="Back")]]
     layout3 = [[sg.Text("Please enter the name of the YAML file you wish to create:")], [sg.Input(key="INPUT2")], [sg.Button("Ok", key="Ok2")], [sg.Button("Back", key="Back2")]]
-    layout4 = [[sg.Graph((800, 800), (-400, -400), (400, 400), background_color='white', key="GRAPH")]]
-    layout5 = [[sg.Button("Add new Node", key ="add_node")],[sg.Button("Delete Node", key ="del_node")],[sg.Button("Move Node", key ="move_node")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
+    layout4 = [[sg.Graph((800, 800), (-400, -400), (400, 400), background_color='white',enable_events = True,right_click_menu = menu, key="GRAPH")]]
+    layout5 = [[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
     layout =  [[sg.Column(layout1, key="COL1"), sg.Column(layout2, visible=False, key="COL2"), sg.Column(layout3, visible=False, key="COL3"), sg.Column(layout4, visible=False, key="COL4"), sg.Column(layout5, visible=False, key="COL5")]]
     window = sg.Window("Topology GUI", layout, resizable=True).Finalize()
     while True:
@@ -47,18 +48,22 @@ def home():
             window["COL5"].update(visible=False)
             window["COL1"].update(visible=True)
             window.normal()
-        elif event == "add_node":
-            node_name = sg.popup_get_text("Please enter a name for the node")
-            node_loc = sg.popup_get_text("Please enter the coords to add the node (x,y)")
-            add_point(node_name, node_loc)
-            draw_map(window)
-        elif event == "del_node":
-            sg.Popup()
-        elif event == "move_node":
-            sg.Popup()
         elif event == "save":
             sg.Popup()
-
+        elif event in ("New Node"):
+            x, y = values["GRAPH"]
+            node_name = sg.popup_get_text("Please enter a name for the node")
+            add_point(node_name, x, y)
+            draw_map(window)
+        elif event in ("Move Node"):
+            x, y = values["GRAPH"]
+            print(x,y)
+        elif event in ("Edit Node"):
+            x, y = values["GRAPH"]
+            print(x,y)
+        elif event in ("Delete Node"):
+            x, y = values["GRAPH"]
+            print(x,y)
     window.close()
 
 def load_yaml(filename):
@@ -77,6 +82,7 @@ def new_yaml(name):
     yaml_file.new(name)
 
 def draw_map(window):
+    print("drawing")
     try:
         window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name + ".png"), location=(-400,400))
     except:
@@ -108,13 +114,12 @@ def draw_map(window):
     window["COL5"].update(visible=True)
     window.Maximize()
 
-def add_point(name,xy):
-    coords = xy.split(",")
+def add_point(name,x, y):
     yaml_data = {
         "node": {
             "name": name,
             "pose": {
-                "position": {"x": int(coords[0]), "y": int(coords[1]), "z": 0.0},
+                "position": {"x": int(x/10), "y": int(y/10), "z": 0.0},
                 "orientation": {"w": 0, "x": 0, "y": 0, "z": 0}
             },
             "edges": []
@@ -123,4 +128,8 @@ def add_point(name,xy):
     value = point(yaml_data)
     print(value)
     yaml_file.points.append(value)
+    print (yaml_file)
+def del_point():
+    print("test")
+    
 home()

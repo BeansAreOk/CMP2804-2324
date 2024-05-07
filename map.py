@@ -7,6 +7,9 @@ class map:
         self.map_name = ""
         self.points = []
 
+    def __str__(self):
+        return str(self.map_name) + str(self.points)
+    
     def new(self, name):
         self.map_name = name
         self.points.clear()
@@ -17,7 +20,7 @@ class map:
                 values = yaml.safe_load(stream)
                 yaml.nodes
                 self.map_name = values["name"]
-                print(values)
+                #print(values)
 
                 self.points.clear()
                 for value in values["nodes"]:
