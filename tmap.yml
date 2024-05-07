@@ -1,7 +1,7 @@
 meta:
   last_updated: 2021-04-21_08-23-39
 metric_map: riseholme
-name: riseholme_rtk
+name: map
 nodes:
 - meta:
     map: riseholme

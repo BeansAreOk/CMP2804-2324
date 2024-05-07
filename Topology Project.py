@@ -33,7 +33,8 @@ def home():
                 window["text1"].update(["File not found."])
         elif event == "Ok2":
             file1 = values["INPUT2"] 
-            print(file1)
+            new_yaml(file1)
+            draw_map(window)
         elif event == "Back":
             window["COL2"].update(visible=False)
             window["COL1"].update(visible=True)
@@ -47,36 +48,45 @@ def load_yaml(filename):
     if not filename.endswith(".yml"):
             filename = filename + ".yml"
 
-    return yaml_file.read_yaml(os.path.join(__location__, filename))
+    return yaml_file.read(os.path.join(__location__, filename))
+
+def save_yaml(filename, original_filename = "default.yml"):
+    if not filename.endswith(".yml"):
+            filename = filename + ".yml"
+
+    return yaml_file.write(os.path.join(__location__, filename), os.path.join(__location__, original_filename))
+
+def new_yaml(name):
+    yaml_file.new(name)
 
 def draw_map(window):
     try:
-        window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name), location=(-400,400))
-
-        for point in yaml_file.points: # draw edges
-            xcoord = point.coord[0] * map_scale
-            ycoord = point.coord[1] * map_scale
-            xcoord2 = xcoord
-            ycoord2 = ycoord
-
-            for edge in point.edges:
-                for point2 in yaml_file.points:
-                    if point2.name == edge:
-                        xcoord2 = point2.coord[0] * map_scale
-                        ycoord2 = point2.coord[1] * map_scale
-            
-            if xcoord != xcoord2 or ycoord != ycoord2:
-                window["GRAPH"].draw_line((xcoord, ycoord), (xcoord2, ycoord2))
-            
-        for point in yaml_file.points: # draw nodes
-            xcoord = point.coord[0] * map_scale
-            ycoord = point.coord[1] * map_scale
-            window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
-            
-        window["COL2"].update(visible=False)
-        window["COL4"].update(visible=True)
+        window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name + ".png"), location=(-400,400))
     except:
-        window["text1"].update(["Map related to this YAML file not found"])
+        print("Map related to this YAML file not found")
+
+    for point in yaml_file.points: # draw edges
+        xcoord = point.coord[0] * map_scale
+        ycoord = point.coord[1] * map_scale
+        xcoord2 = xcoord
+        ycoord2 = ycoord
+
+        for edge in point.edges:
+            for point2 in yaml_file.points:
+                if point2.name == edge:
+                    xcoord2 = point2.coord[0] * map_scale
+                    ycoord2 = point2.coord[1] * map_scale
+        
+        if xcoord != xcoord2 or ycoord != ycoord2:
+            window["GRAPH"].draw_line((xcoord, ycoord), (xcoord2, ycoord2))
+        
+    for point in yaml_file.points: # draw nodes
+        xcoord = point.coord[0] * map_scale
+        ycoord = point.coord[1] * map_scale
+        window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
+        
+    window["COL2"].update(visible=False)
+    window["COL4"].update(visible=True)
 
     
 home()
