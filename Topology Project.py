@@ -5,6 +5,7 @@ from map import map
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 yaml_file = map()
+map_scale = 10
 
 def home():
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
@@ -43,24 +44,35 @@ def home():
     window.close()
 
 def load_yaml(filename):
+    if not filename.endswith(".yml"):
+            filename = filename + ".yml"
+
     return yaml_file.read_yaml(os.path.join(__location__, filename))
 
 def draw_map(window):
     try:
         window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name), location=(-400,400))
-        pointval = 0
-        for point in yaml_file.points:
-            print(pointval)
-            xcoord = point.coord[0] * 100
-            ycoord = point.coord[1] * 100
-            if pointval == 0:
-                coords = (xcoord,ycoord)
-                pointval = pointval +1
-            elif pointval == 1:
-                coords2 = (xcoord,ycoord)
-                window["GRAPH"].draw_line(coords, coords2)
-                coords = coords2
+
+        for point in yaml_file.points: # draw edges
+            xcoord = point.coord[0] * map_scale
+            ycoord = point.coord[1] * map_scale
+            xcoord2 = xcoord
+            ycoord2 = ycoord
+
+            for edge in point.edges:
+                for point2 in yaml_file.points:
+                    if point2.name == edge:
+                        xcoord2 = point2.coord[0] * map_scale
+                        ycoord2 = point2.coord[1] * map_scale
+            
+            if xcoord != xcoord2 or ycoord != ycoord2:
+                window["GRAPH"].draw_line((xcoord, ycoord), (xcoord2, ycoord2))
+            
+        for point in yaml_file.points: # draw nodes
+            xcoord = point.coord[0] * map_scale
+            ycoord = point.coord[1] * map_scale
             window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
+            
         window["COL2"].update(visible=False)
         window["COL4"].update(visible=True)
     except:

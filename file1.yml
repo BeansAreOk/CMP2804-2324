@@ -1,3 +1,8 @@
+meta:
+  last_updated: 2021-04-21_08-23-39
+metric_map: example_map
+name: example_map_rtk
+nodes:
 - meta:
     map: example_map
     node: Start
