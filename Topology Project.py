@@ -1,7 +1,11 @@
 import PySimpleGUI as sg
 import yaml
 import os.path
+from map import map
+
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+yaml_file = map()
+
 def home():
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
     layout2 = [[sg.Text("Please enter the name of the YAML file you wish to open:", key="text1")], [sg.Input(key="INPUT")], [sg.Button("Ok", key="Ok1")], [sg.Button("Back", key="Back")]]
@@ -22,32 +26,9 @@ def home():
             window["COL3"].update(visible=True)
         elif event == "Ok1":
             file1 = values["INPUT"] 
-            file = os.path.join(__location__, file1)
-            try:
-                with open(file) as stream:
-                    values = yaml.safe_load(stream)
-                    map = os.path.join(__location__, values[0]["meta"]["map"] + ".png")
-                    print(values)
-                    try:
-                        window["GRAPH"].draw_image(map, location=(-400,400))
-                        pointval = 0
-                        for value in values:
-                            print(pointval)
-                            xcoord = value["node"]["pose"]["position"]["x"]*100
-                            ycoord = value["node"]["pose"]["position"]["y"]*100
-                            if pointval == 0:
-                                coords = (xcoord,ycoord)
-                                pointval = pointval +1
-                            elif pointval == 1:
-                                coords2 = (xcoord,ycoord)
-                                window["GRAPH"].draw_line(coords, coords2)
-                                coords = coords2
-                            window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
-                        window["COL2"].update(visible=False)
-                        window["COL4"].update(visible=True)
-                    except:
-                        window["text1"].update(["Map related to this YAML file not found"])
-            except:
+            if load_yaml(file1):
+                draw_map(window)
+            else:
                 window["text1"].update(["File not found."])
         elif event == "Ok2":
             file1 = values["INPUT2"] 
@@ -60,5 +41,30 @@ def home():
             window["COL1"].update(visible=True)
 
     window.close()
+
+def load_yaml(filename):
+    return yaml_file.read_yaml(os.path.join(__location__, filename))
+
+def draw_map(window):
+    try:
+        window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name), location=(-400,400))
+        pointval = 0
+        for point in yaml_file.points:
+            print(pointval)
+            xcoord = point.coord[0] * 100
+            ycoord = point.coord[1] * 100
+            if pointval == 0:
+                coords = (xcoord,ycoord)
+                pointval = pointval +1
+            elif pointval == 1:
+                coords2 = (xcoord,ycoord)
+                window["GRAPH"].draw_line(coords, coords2)
+                coords = coords2
+            window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
+        window["COL2"].update(visible=False)
+        window["COL4"].update(visible=True)
+    except:
+        window["text1"].update(["Map related to this YAML file not found"])
+
     
 home()
