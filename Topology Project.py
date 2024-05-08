@@ -13,13 +13,13 @@ yaml_file = map()
 map_scale = 10
 pointcoords = []
 curr_point = 0
+has_image = True
 def home():
     try:
         want_to_move = False
         want_to_join = False
         want_to_unjoin = False
         file1 = ""
-        
         # Define GUI layouts
         menu = ["menu", ["New Node", "Move Node", "Join Nodes", "Unjoin Nodes", "Edit Node", "Delete Node"]]
         layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
@@ -71,6 +71,8 @@ def home():
                 window["COL1"].update(visible=True)
                 window.normal()                         #Shrinks the window out of full screen and erases the data on the graph
                 window["GRAPH"].erase()
+                global has_image
+                has_image = True
             elif event == "save":
                 sg.Popup("File Saved")                  #Saves the File
                 save_file(file1)
@@ -93,7 +95,6 @@ def home():
                 curr_point = nearest_point([x,y],pointcoords)
                 window["GRAPH"].draw_point((pointcoords[curr_point]),size=8,color="red")        #recoloours point to red for easier visibility
                 want_to_move = True                                                             #sets the point as wanting to move so it will on click
-           
             elif event in ("Join Nodes"):
                 want_to_move = False                #Right click function disables all active functions
                 want_to_join = False
@@ -123,17 +124,25 @@ def home():
                 want_to_unjoin = False
                 x, y = values["GRAPH"]              #Gets current mouse coordinates and locates nearest point to them
                 del_point(nearest_point([x,y],pointcoords))     #Deletes node and then redraws graph
+                window["GRAPH"].erase()
+                add_image(window)
                 draw_map(window)
             elif event in ("GRAPH"):
                 x, y = values["GRAPH"]              #Gets current mouse coordinates from click
                 if want_to_move == True:
                     move_point(curr_point,[x/map_scale,y/map_scale,0])    #If want to move is true it moves old point to new location
+                    window["GRAPH"].erase()
+                    add_image(window)
                     draw_map(window)
                 elif want_to_join == True:
                     join_points(curr_point, nearest_point([x,y],pointcoords))   #If want to join is true it creates an edge between old point and point closest to new click
+                    window["GRAPH"].erase()
+                    add_image(window)
                     draw_map(window)
                 elif want_to_unjoin == True:            
                     unjoin_points(curr_point, nearest_point([x,y],pointcoords)) #If want to unjoin is true it destroys an edge between old point and point closest to new click
+                    window["GRAPH"].erase()
+                    add_image(window)
                     draw_map(window)    
         window.close()
     except Exception as e:
@@ -162,11 +171,14 @@ def new_yaml(name):
         
 #Function to add the background map to the GUI 
 def add_image(window):
-    try:
-        window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name + ".png"), location=(-400,400))        #Tries to draw the map image under the graph if its available
-    except FileNotFoundError:
-        sg.popup_error("Map related to this YAML file not found, using blank map.")
-        
+    global has_image
+    if has_image == True:
+        try:
+            window["GRAPH"].draw_image(os.path.join(__location__, yaml_file.map_name + ".png"), location=(-400,400))        #Tries to draw the map image under the graph if its available
+        except Exception:
+            has_image = False
+            sg.popup("Map related to this YAML file:",yaml_file.map_name,"Not found, using blank map.")
+            
 # Function to draw the nodes and edges on the GUI window
 def draw_map(window):
     # Draw edges
@@ -280,7 +292,7 @@ def save_file(filename):
         with open(filename, 'w') as stream:     # Opening the specified file path in write mode
             yaml.dump(data, stream)             # Writing updated YAML data to the file
     except Exception as e:
-            print(f"An error occurred while writing the YAML file: {e}")
+            sg.popup_error(f"An error occurred while writing the YAML file: {e}")
     
 # Seperate window to display the information of a point and edit some of it
 def edit_window(point,window):
@@ -289,7 +301,7 @@ def edit_window(point,window):
         layout = [[sg.Text("Node name")],[sg.InputText(yaml_file.points[point].name, key="name")],[sg.Text("Node Coordinates (Please make sure they are whole numbers in the same format and within the range of (-400, 400))")],[sg.InputText(("(",yaml_file.points[point].coord[0] * map_scale,"," ,yaml_file.points[point].coord[1] * map_scale,")"), key="coord")],[sg.Text("Node Edges (If you wish to edit edges please use the tool within the gui)")],[sg.InputText(yaml_file.points[point].edges, key="edges")],[sg.Button("Update", key="update")],[sg.Button("Close", key="Exit")]]
         
         # Create the GUI window
-        window2 = sg.Window("Edit node", layout)
+        window2 = sg.Window("test", layout)
         
         # Event loop to handle GUI events
         while True:
