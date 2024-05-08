@@ -289,7 +289,7 @@ def edit_window(point,window):
         layout = [[sg.Text("Node name")],[sg.InputText(yaml_file.points[point].name, key="name")],[sg.Text("Node Coordinates (Please make sure they are whole numbers in the same format and within the range of (-400, 400))")],[sg.InputText(("(",yaml_file.points[point].coord[0] * map_scale,"," ,yaml_file.points[point].coord[1] * map_scale,")"), key="coord")],[sg.Text("Node Edges (If you wish to edit edges please use the tool within the gui)")],[sg.InputText(yaml_file.points[point].edges, key="edges")],[sg.Button("Update", key="update")],[sg.Button("Close", key="Exit")]]
         
         # Create the GUI window
-        window2 = sg.Window("test", layout)
+        window2 = sg.Window("Edit node", layout)
         
         # Event loop to handle GUI events
         while True:
