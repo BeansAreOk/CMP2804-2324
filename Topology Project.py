@@ -17,7 +17,7 @@ def home():
     menu = ["menu", ["New Node", 'Move Node', "Join Nodes", "Unjoin Nodes", "Delete Node"]]
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
     layout2 = [[sg.Text("Please enter the name of the YAML file you wish to open:", key="text1")], [sg.Input(key="INPUT")], [sg.Button("Ok", key="Ok1")], [sg.Button("Back", key="Back")]]
-    layout3 = [[sg.Text("Please enter the name of the YAML file you wish to create:")], [sg.Input(key="INPUT2")], [sg.Button("Ok", key="Ok2")], [sg.Button("Back", key="Back2")]]
+    layout3 = [[sg.Text("Please enter the name of the YAML file you wish to create:", key="text2")], [sg.Input(key="INPUT2")], [sg.Button("Ok", key="Ok2")], [sg.Button("Back", key="Back2")]]
     layout4 = [[sg.Graph((800, 800), (-400, -400), (400, 400), background_color='white',enable_events = True,right_click_menu = menu, key="GRAPH")]]
     layout5 = [[sg.Text("To add, move, join and delete nodes please right click on the display area to the left.")],[sg.Text("When moving a node the selected node will be displayed in red and when joining it will be green.")],[sg.Text("When moving a node left click where you wish to move it to after selecting your node.")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
     layout =  [[sg.Column(layout1, key="COL1"), sg.Column(layout2, visible=False, key="COL2"), sg.Column(layout3, visible=False, key="COL3"), sg.Column(layout4, visible=False, key="COL4"), sg.Column(layout5, visible=False, key="COL5")]]
@@ -34,14 +34,20 @@ def home():
             window["COL3"].update(visible=True)
         elif event == "Ok1":
             file1 = values["INPUT"] 
-            if load_yaml(file1):
+            if load_yaml(file_type(file1)):
                 draw_map(window)
             else:
-                window["text1"].update(["File not found."])
+                window["text1"].update("File not found.")
         elif event == "Ok2":
             file1 = values["INPUT2"] 
-            new_yaml(file1)
-            draw_map(window)
+            print(file_type(file1))
+            if os.path.isfile(os.path.join(__location__,(file_type(file1)))):
+                window["text2"].update("File already exists")
+            elif file1 is not "":
+                new_yaml(file1)
+                draw_map(window)
+            else:
+                window["text2"].update("Please enter a file name.")
         elif event == "Back":
             window["COL2"].update(visible=False)
             window["COL1"].update(visible=True)
@@ -62,9 +68,12 @@ def home():
             want_to_join = False
             want_to_unjoin = False
             x, y = values["GRAPH"]
-            node_name = sg.popup_get_text("Please enter a name for the node")
-            add_point(node_name, x, y)
-            draw_map(window)
+            while True:
+                node_name = sg.popup_get_text("Please enter a name for the node")
+                if node_name is not "":
+                    add_point(node_name, x, y)
+                    draw_map(window)
+                    break
         elif event in ("Move Node"):
             want_to_move = False
             want_to_join = False
@@ -109,16 +118,14 @@ def home():
             draw_map(window)
     window.close()
 
-def load_yaml(filename):
+def file_type(filename):
     if not filename.endswith(".yml"):
-            filename = filename + ".yml"
-
+        filename = filename + ".yml"
+    return filename
+def load_yaml(filename):
     return yaml_file.read(os.path.join(__location__, filename))
 
 def save_yaml(filename, original_filename = "default.yml"):
-    if not filename.endswith(".yml"):
-            filename = filename + ".yml"
-
     return yaml_file.write(os.path.join(__location__, filename), os.path.join(__location__, original_filename))
 
 def new_yaml(name):
