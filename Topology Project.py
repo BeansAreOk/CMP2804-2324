@@ -10,14 +10,15 @@ yaml_file = map()
 map_scale = 10
 pointcoords = []
 curr_point = 0
-want_to_move = False
 def home():
-    menu = ["menu", ["New Node", 'Move Node', "Edit Node", "Delete Node"]]
+    want_to_move = False
+    want_to_join = False
+    menu = ["menu", ["New Node", 'Move Node', "Join Nodes", "Delete Node"]]
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
     layout2 = [[sg.Text("Please enter the name of the YAML file you wish to open:", key="text1")], [sg.Input(key="INPUT")], [sg.Button("Ok", key="Ok1")], [sg.Button("Back", key="Back")]]
     layout3 = [[sg.Text("Please enter the name of the YAML file you wish to create:")], [sg.Input(key="INPUT2")], [sg.Button("Ok", key="Ok2")], [sg.Button("Back", key="Back2")]]
     layout4 = [[sg.Graph((800, 800), (-400, -400), (400, 400), background_color='white',enable_events = True,right_click_menu = menu, key="GRAPH")]]
-    layout5 = [[sg.Text("To add, move, edit and delete nodes please right click on the display area to the left.")],[sg.Text("When moving a point left click where you wish to move it to after selecting your point.")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
+    layout5 = [[sg.Text("To add, move, join and delete nodes please right click on the display area to the left.")],[sg.Text("When moving a node the selected node will be displayed in red and when joining it will be green.")],[sg.Text("When moving a node left click where you wish to move it to after selecting your node.")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
     layout =  [[sg.Column(layout1, key="COL1"), sg.Column(layout2, visible=False, key="COL2"), sg.Column(layout3, visible=False, key="COL3"), sg.Column(layout4, visible=False, key="COL4"), sg.Column(layout5, visible=False, key="COL5")]]
     window = sg.Window("Topology GUI", layout, resizable=True).Finalize()
     while True:
@@ -54,23 +55,37 @@ def home():
         elif event == "save":
             sg.Popup()
         elif event in ("New Node"):
+            want_to_move = False
+            want_to_join = False
             x, y = values["GRAPH"]
             node_name = sg.popup_get_text("Please enter a name for the node")
             add_point(node_name, x, y)
             draw_map(window)
         elif event in ("Move Node"):
+            want_to_move = False
+            want_to_join = False
             x, y = values["GRAPH"]
             curr_point = nearest_point([x,y],pointcoords)
+            window["GRAPH"].draw_point((pointcoords[curr_point]),size=8,color="red")
             want_to_move = True
         elif event in ("GRAPH"):
             x, y = values["GRAPH"]
             if want_to_move == True:
                 move_point(curr_point,[x/10,y/10,0])
                 draw_map(window)
-        elif event in ("Edit Node"):
+            elif want_to_join == True:
+                join_points(curr_point, nearest_point([x,y],pointcoords))
+                draw_map(window)
+        elif event in ("Join Nodes"):
+            want_to_move = False
+            want_to_join = False
             x, y = values["GRAPH"]
-            print(x,y)
+            curr_point = nearest_point([x,y],pointcoords)
+            window["GRAPH"].draw_point((pointcoords[curr_point]),size=8,color="green")
+            want_to_join = True
         elif event in ("Delete Node"):
+            want_to_move = False
+            want_to_join = False
             x, y = values["GRAPH"]
             del_point(nearest_point([x,y],pointcoords))
             draw_map(window)
@@ -149,4 +164,12 @@ def del_point(index):
 
 def move_point(index,coords):
     yaml_file.points[index].coord = coords
+    
+def join_points(point1, point2):
+    if yaml_file.points[point2].name not in yaml_file.points[point1].edges:
+        yaml_file.points[point1].edges.append(yaml_file.points[point2].name)
+    if yaml_file.points[point1].name not in yaml_file.points[point2].edges:    
+        yaml_file.points[point2].edges.append(yaml_file.points[point1].name)
+    print(yaml_file.points[point1].edges)
+    print(yaml_file.points[point2].edges)
 home()
