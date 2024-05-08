@@ -14,12 +14,13 @@ def home():
     want_to_move = False
     want_to_join = False
     want_to_unjoin = False
-    menu = ["menu", ["New Node", 'Move Node', "Join Nodes", "Unjoin Nodes", "Delete Node"]]
+    file1 = ""
+    menu = ["menu", ["New Node", "Move Node", "Join Nodes", "Unjoin Nodes", "Edit Node", "Delete Node"]]
     layout1 = [[sg.Text("Please choose an option:")], [sg.Button("Load YAML file")], [sg.Button("New YAML file")], [sg.Button("Exit")]]
     layout2 = [[sg.Text("Please enter the name of the YAML file you wish to open:", key="text1")], [sg.Input(key="INPUT")], [sg.Button("Ok", key="Ok1")], [sg.Button("Back", key="Back")]]
     layout3 = [[sg.Text("Please enter the name of the YAML file you wish to create:", key="text2")], [sg.Input(key="INPUT2")], [sg.Button("Ok", key="Ok2")], [sg.Button("Back", key="Back2")]]
     layout4 = [[sg.Graph((800, 800), (-400, -400), (400, 400), background_color='white',enable_events = True,right_click_menu = menu, key="GRAPH")]]
-    layout5 = [[sg.Text("To add, move, join and delete nodes please right click on the display area to the left.")],[sg.Text("When moving a node the selected node will be displayed in red and when joining it will be green.")],[sg.Text("When moving a node left click where you wish to move it to after selecting your node.")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
+    layout5 = [[sg.Text("To add, move, join and delete nodes please right click on the display area to the left.")],[sg.Text("When moving a node the selected node will be displayed in red and when joining it will be green.")],[sg.Text("When moving a node left click where you wish to move it to after selecting your node.")],[sg.Text("If you wish to view/edit information relating to nodes right click on them and select Edit Node.")],[sg.Button("Save", key ="save")],[sg.Button("Back", key ="Back4")]]
     layout =  [[sg.Column(layout1, key="COL1"), sg.Column(layout2, visible=False, key="COL2"), sg.Column(layout3, visible=False, key="COL3"), sg.Column(layout4, visible=False, key="COL4"), sg.Column(layout5, visible=False, key="COL5")]]
     window = sg.Window("Topology GUI", layout, resizable=True).Finalize()
     while True:
@@ -40,10 +41,9 @@ def home():
                 window["text1"].update("File not found.")
         elif event == "Ok2":
             file1 = values["INPUT2"] 
-            print(file_type(file1))
             if os.path.isfile(os.path.join(__location__,(file_type(file1)))):
                 window["text2"].update("File already exists")
-            elif file1 is not "":
+            elif file1 != "":
                 new_yaml(file1)
                 draw_map(window)
             else:
@@ -59,10 +59,10 @@ def home():
             window["COL5"].update(visible=False)
             window["COL1"].update(visible=True)
             window.normal()
-            yaml_file.map_name = ""
-            yaml_file.points = []
+            window["GRAPH"].erase()
         elif event == "save":
-            sg.Popup()
+            sg.Popup("File Saved")
+            save_file(file1)
         elif event in ("New Node"):
             want_to_move = False
             want_to_join = False
@@ -70,7 +70,7 @@ def home():
             x, y = values["GRAPH"]
             while True:
                 node_name = sg.popup_get_text("Please enter a name for the node")
-                if node_name is not "":
+                if node_name != "":
                     add_point(node_name, x, y)
                     draw_map(window)
                     break
@@ -109,6 +109,10 @@ def home():
             curr_point = nearest_point([x,y],pointcoords)
             window["GRAPH"].draw_point((pointcoords[curr_point]),size=8,color="green")
             want_to_unjoin = True
+        elif event in ("Edit Node"):
+            x, y = values["GRAPH"]
+            curr_point = nearest_point([x,y],pointcoords)
+            edit_window(curr_point, window)
         elif event in ("Delete Node"):
             want_to_move = False
             want_to_join = False
@@ -116,6 +120,7 @@ def home():
             x, y = values["GRAPH"]
             del_point(nearest_point([x,y],pointcoords))
             draw_map(window)
+            
     window.close()
 
 def file_type(filename):
@@ -124,9 +129,6 @@ def file_type(filename):
     return filename
 def load_yaml(filename):
     return yaml_file.read(os.path.join(__location__, filename))
-
-def save_yaml(filename, original_filename = "default.yml"):
-    return yaml_file.write(os.path.join(__location__, filename), os.path.join(__location__, original_filename))
 
 def new_yaml(name):
     yaml_file.new(name)
@@ -153,23 +155,31 @@ def draw_map(window):
     pointcoords.clear()   
     for point in yaml_file.points: # draw nodes
         xcoord = point.coord[0] * map_scale
-        ycoord = point.coord[1] * map_scale
-        
+        ycoord = point.coord[1] * map_scale   
         pointcoords.append([xcoord, ycoord])
         window["GRAPH"].draw_point((xcoord, ycoord),size=8,color="blue")
-        
     window["COL2"].update(visible=False)
     window["COL3"].update(visible=False)
     window["COL4"].update(visible=True)
     window["COL5"].update(visible=True)
     window.Maximize()
 
+def largest_point():
+    far_coord = []
+    big_coord = 0
+    for point in pointcoords:
+        point = np.asarray(point)
+        far_coord.append(point[(np.abs(point - 0)).argmax()])
+    far_coord = np.asarray(far_coord)
+    big_coord = (far_coord[(np.abs(far_coord - 0)).argmax()])
+    print(big_coord)
+    
 def add_point(name,x, y):
     yaml_data = {
         "node": {
             "name": name,
             "pose": {
-                "position": {"x": int(x/10), "y": int(y/10), "z": 0.0},
+                "position": {"x": int(x/map_scale), "y": int(y/map_scale), "z": 0.0},
                 "orientation": {"w": 0, "x": 0, "y": 0, "z": 0}
             },
             "edges": []
@@ -194,9 +204,47 @@ def join_points(point1, point2):
         yaml_file.points[point1].edges.append(yaml_file.points[point2].name)
     if yaml_file.points[point1].name not in yaml_file.points[point2].edges:    
         yaml_file.points[point2].edges.append(yaml_file.points[point1].name)
+        
 def unjoin_points(point1, point2):
     if yaml_file.points[point2].name in yaml_file.points[point1].edges:
         yaml_file.points[point1].edges.remove(yaml_file.points[point2].name)
     if yaml_file.points[point1].name in yaml_file.points[point2].edges:    
         yaml_file.points[point2].edges.remove(yaml_file.points[point1].name)
+        
+def save_file(filename):
+    data = yaml_file.write()
+    filename = file_type(os.path.join(__location__,filename))
+    with open(filename, 'w') as stream:
+        yaml.dump(data, stream)
+    
+def edit_window(point,window):
+    layout = [[sg.Text("Node name")],[sg.InputText(yaml_file.points[point].name, key="name")],[sg.Text("Node Coordinates (Please make sure they are whole numbers in the same format.)")],[sg.InputText(("(",yaml_file.points[point].coord[0] * map_scale,"," ,yaml_file.points[point].coord[1] * map_scale,")"), key="coord")],[sg.Text("Node Edges (If you wish to edit edges please use the tool within the gui)")],[sg.InputText(yaml_file.points[point].edges, key="edges")],[sg.Button("Update", key="update")],[sg.Button("Close", key="Exit")]]
+    window2 = sg.Window("test", layout)
+    while True:
+        event, values = window2.read()
+        if event == "Exit" or event == sg.WIN_CLOSED:
+            break
+        elif event == "update":
+            newname = values["name"]
+            yaml_file.points[point].name = newname
+            val = values["coord"]
+            print(val)
+            newcoord = val.replace("(", "").replace(")", "").replace(".0", "").split((", " or " "))
+            if is_int(newcoord[0]) and is_int(newcoord[1]):
+                print("pass")
+                if (-400 <= int(newcoord[0]) <= 400) and (-400 <= int(newcoord[1]) <= 400):
+                    print("test")
+                    yaml_file.points[point].coord = [int(newcoord[0])/map_scale,int(newcoord[1])/map_scale,0]
+            draw_map(window)
+    window2.close()  
+          
+def is_int(val):  
+    try: 
+        int(val)
+    except ValueError:
+        print(val)
+        return False
+    else:
+        return True
+    
 home()

@@ -27,3 +27,27 @@ class point:
   
     def __str__(self):
         return str(self.name) + str(self.coord) + str(self.orientation) + str(self.edges)
+    
+    def yaml_point(self,map):
+        edges = []
+        for edge in self.edges:
+            edge_yaml = {
+                "action": "move_base",
+                "edge_id": self.name + "_" + edge,
+                "node": edge
+                }
+            edges.append(edge_yaml)
+        yaml_data = {  
+        "meta": {
+            "map": map,
+            "node": self.name},
+        "node": {
+            "name": self.name,
+            "pose": {
+                "position": {"x": self.coord[0], "y": self.coord[1], "z": self.coord[2]},
+                "orientation": {"w": self.orientation[0], "x": self.orientation[1], "y": self.orientation[2], "z": self.orientation[3]}
+            },
+            "edges": edges
+        }
+        }
+        return yaml_data

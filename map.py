@@ -30,37 +30,16 @@ class map:
         except:
             return False
         
-    def write(self, file_path, original_path):
-        '''
+    def write(self): 
+        nodedata = []
+        for point in self.points:
+            nodedata.append(point.yaml_point(self.map_name))
         data = {
             "name" : self.map_name,
-            "metric_map" : ,
+            "metric_map" : "",
             "meta" : {"last_updated": "2021-04-21_08-23-39"},
             "metric_map" : self.map_name,
             
-            "nodes" : [{
-                "meta": {
-                    "map": self.map_name, 
-                    "node" : node.name,
-                    "pointset" : self.map_name
-                }, 
-                "node": {
-                    "edges": [{
-                        "action" : "action",
-                        "action" : "action",
-                        "action" : "action",
-                        "action" : "action",
-                        "action" : "action",
-                        "action" : "action",
-                    }]
-                }   
-            }]
-        }
-        '''
-        with open(os.path.join(original_path), 'r') as stream:
-            values = yaml.safe_load(stream)
-
-            values["name"] = self.map_name
-
-            with open(file_path, 'w') as stream:
-                yaml.dump(values, stream, default_flow_style=False, sort_keys=False)
+            "nodes" : nodedata
+            }
+        return data
