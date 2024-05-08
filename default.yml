@@ -1,0 +1,98 @@
+name:       new_map
+metric_map: map2d
+pointset:   new_map
+transformation:
+  rotation:
+    w: 1.0
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  translation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  child: topo_map
+  parent: map
+meta:
+  last_updated: 2020-02-18 12:00 am
+nodes:
+- meta:
+    map: map2d
+    node: WayPoint001        
+    pointset: new_map
+  node:                                 
+    edges:                        
+    - action: move_action                
+      edge_id: WayPoint001_WayPoint002
+      node: WayPoint002
+      config: &move_action_config_1             
+      - namespace: param1_namespace                   
+        name: param1_name
+        value: param1_value
+      - namespace: param2_namespace                   
+        name: param2_name
+        value: param2_value
+      recovery_behaviours_config: ''
+      action_type: 'move_action_msgs/MoveActionGoal'      
+      goal:
+        target_pose:
+          header:
+            frame_id: $node.parent_frame
+          pose: $node.pose
+      fail_policy: retry_3, replan, fail        
+      fluid_navigation: true        
+      restrictions_planning: (robot_tall & task_transportation) |  ~ robot_narrow
+      restrictions_runtime: pose_exact
+    - action: move_action                
+      edge_id: WayPoint001_WayPoint003
+      node: WayPoint003
+      config: &move_action_config_2             
+      - namespace: param3_namespace                   
+        name: param3_name
+        value: param3_value
+      recovery_behaviours_config: ''
+      action_type: move_action_msgs/MoveActionGoal      
+      goal:
+        target_pose:
+          header:
+            frame_id: $node.parent_frame
+          pose: $node.pose
+      fail_policy: fail                    
+      fluid_navigation: true        
+      restrictions_planning: (robot_tall & task_transportation) |  ~ robot_narrow
+      restrictions_runtime: 'True'
+    localise_by_topic: ''                       
+    name: WayPoint001                        
+    parent_frame: map
+    pose:                        
+      orientation:                              
+        w: 0.92388
+        x: 0
+        y: 0
+        z: 0.38268
+      position:                        
+        x: 0.0
+        y: 0.0
+        z: 0.0
+    verts:                        
+    - x: 0.689
+      y: 0.287
+    - x: 0.287
+      y: 0.689
+    - x: -0.287
+      y: 0.689
+    - x: -0.689
+      y: 0.287
+    - x: -0.689
+      y: -0.287
+    - x: -0.287
+      y: -0.689
+    - x: 0.287
+      y: -0.689
+    - x: 0.689
+      y: -0.287
+    properties:
+      xy_goal_tolerance: 0.3                
+      yaw_goal_tolerance: 0.1                 
+    restrictions_planning: (robot_tall & task_transportation) |  ~ robot_narrow
+    restrictions_runtime: 'True'
