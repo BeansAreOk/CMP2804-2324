@@ -1,4 +1,4 @@
-This was created for University of Lincoln, Team Software Engineering Assignment.
+This is the development branch created for University of Lincoln, Team Software Engineering Assignment.
 
 Libraries required to build project:
 
