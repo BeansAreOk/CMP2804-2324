@@ -13,10 +13,10 @@ class map:
     
     # Creates a new map
     def new(self, name):
-        self.map_name = name #sets the map name to users input 
-        self.points.clear() #makes the points list empty
+        self.map_name = name
+        self.points.clear() # makes the points list empty
 
-    # Reads map data from yaml file
+    # Reads and processes map data from yaml file
     def read(self, file_path):
         try:
             with open(file_path, 'r') as stream: #opens the file in read only mode
@@ -40,7 +40,7 @@ class map:
             print(f"An error occurred while reading the YAML file: {e}")
             return False                
     
-    # Writes map data to a yaml file 
+    # Returns the data in yaml format 
     def write(self): 
         try:
             nodedata = [] #inititializes an empty list called nodedata
