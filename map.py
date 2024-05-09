@@ -1,49 +1,53 @@
-import yaml                 # Importing the yaml module for YAML file handling
-from point import point     # Importing the point class, presumably used for managing map points
+import yaml  
+from point import point 
 
 class map:
+
+    # Initializes attributes to empty string/list
     def __init__(self):
-        self.map_name = ""  # Initializing map_name attribute to an empty string
-        self.points = []    # Initializing points attribute to an empty list
+        self.map_name = ""  
+        self.points = [] 
 
     def __str__(self):
-        return str(self.map_name) + str(self.points)    # Returning a string representation of map_name and points
+        return str(self.map_name) + str(self.points)
     
+    # Creates a new map
     def new(self, name):
-        self.map_name = name    # Setting the map_name attribute to the provided name
-        self.points.clear()     # Clearing the list of points
+        self.map_name = name #sets the map name to users input 
+        self.points.clear() #makes the points list empty
 
+    # Reads map data from yaml file
     def read(self, file_path):
         try:
-            with open(file_path, 'r') as stream:    # Opening the file specified by file_path in read mode
-                values = yaml.safe_load(stream)     # Loading YAML data from the file into values
+            with open(file_path, 'r') as stream: #opens the file in read only mode
+                values = yaml.safe_load(stream) #loads the data from the yaml file into the values variable
                 yaml.nodes
                 
                 if values is None:
-                    return False        # Return False if YAML data is empty or None
+                    return False  
                 
-                self.map_name = values["name"]      # Setting map_name to the "name" field from the YAML data
+                self.map_name = values["name"]
 
-                self.points.clear()     # Clearing the list of points
+                self.points.clear() #makes the points list empty 
                 
-                if "nodes" in values:               # Looping through the "nodes" field in the YAML data
-                    for value in values["nodes"]:   # Creating a new point object from the data
-                        node = point(value)         # Appending the point object to the list of points
-                        self.points.append(node)    # Returning True to indicate successful reading
-                
-                return True             # Returning True to indicate successful reading
+                if "nodes" in values:    
+                    for value in values["nodes"]: #Iterates over each item in the list that is linked with "nodes"
+                        node = point(value) #creates a point object with value as an argument and calls it a node
+                        self.points.append(node) #appends the node object to the points list                
+                return True           
             
         except Exception as e:
             print(f"An error occurred while reading the YAML file: {e}")
-            return False                # Returning False if an exception occurs during reading
+            return False                
     
-    # Function to write map data to a YAML file   
+    # Writes map data to a yaml file 
     def write(self): 
         try:
-            nodedata = []
-            for point in self.points:       #Puts all the nodes in the points array into a dictionary in YAML format
-                nodedata.append(point.yaml_point(self.map_name))
-            data = {                        #Defines the main body of the YAML file for saving
+            nodedata = [] #inititializes an empty list called nodedata
+            for point in self.points: #for loop that iterates over each element in the self.points list
+                nodedata.append(point.yaml_point(self.map_name)) #calls yaml_point method for all point objects and appends the result to the nodedata list
+            #initiliazes a dictionary called data with multiple key value pairs
+            data = {     
                 "name" : self.map_name,
                 "metric_map" : "",
                 "meta" : {"last_updated": "2021-04-21_08-23-39"},
