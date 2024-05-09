@@ -45,8 +45,7 @@ def home():
                 window["COL3"].update(visible=True)
             elif event == "Ok1":
                 file1 = values["INPUT"] 
-                if load_yaml(file_type(file1)):         #Tries to load the YAML file and draw the data
-                    add_image(window)                   
+                if load_yaml(file_type(file1)):         #Tries to load the YAML file and draw the data                  
                     draw_map(window)
                 else:
                     window["text1"].update("File not found.")
@@ -124,37 +123,29 @@ def home():
                 want_to_unjoin = False
                 x, y = values["GRAPH"]              #Gets current mouse coordinates and locates nearest point to them
                 del_point(nearest_point([x,y],pointcoords))     #Deletes node and then redraws graph
-                window["GRAPH"].erase()
-                add_image(window)
                 draw_map(window)
             elif event in ("GRAPH"):
                 x, y = values["GRAPH"]              #Gets current mouse coordinates from click
                 if want_to_move == True:
                     move_point(curr_point,[x/map_scale,y/map_scale,0])    #If want to move is true it moves old point to new location
-                    window["GRAPH"].erase()
-                    add_image(window)
                     draw_map(window)
                 elif want_to_join == True:
                     join_points(curr_point, nearest_point([x,y],pointcoords))   #If want to join is true it creates an edge between old point and point closest to new click
-                    window["GRAPH"].erase()
-                    add_image(window)
                     draw_map(window)
                 elif want_to_unjoin == True:            
                     unjoin_points(curr_point, nearest_point([x,y],pointcoords)) #If want to unjoin is true it destroys an edge between old point and point closest to new click
-                    window["GRAPH"].erase()
-                    add_image(window)
                     draw_map(window)    
         window.close()
     except Exception as e:
         sg.popup_error(f"An error occurred: {e}")
 
-# Function that checks file type
+# checks that the file is of the right type
 def file_type(filename):
     if not filename.endswith(".yml"):
         filename = filename + ".yml"
     return filename
 
-# Function to load YAML file
+# load YAML file and saves it data to yaml_file
 def load_yaml(filename):
     try:    
         return yaml_file.read(os.path.join(__location__, filename))
@@ -181,6 +172,10 @@ def add_image(window):
             
 # Function to draw the nodes and edges on the GUI window
 def draw_map(window):
+    
+    window["GRAPH"].erase() # clear old map for a redraw
+    add_image(window)
+    
     # Draw edges
     for point in yaml_file.points:                  #Goes through every node temporarily saving their coordinates
         xcoord = point.coord[0] * map_scale
@@ -284,7 +279,7 @@ def unjoin_points(point1, point2):
     except Exception as e:
         sg.popup_error(f"An error occurred while unjoining nodes: {e}")
   
-# Function to save YAML file      
+# save YAML data to the specified filename
 def save_file(filename):
     try:
         data = yaml_file.write()
